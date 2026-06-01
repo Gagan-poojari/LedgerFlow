@@ -87,13 +87,20 @@ export async function PUT(request, { params }) {
       await applyInvoiceValidation(invoice, { updateStatus: false });
     }
 
-    if (
-      poFieldsChanged &&
-      !body.markValidated &&
-      invoice.poNumber?.trim() &&
-      invoice.status === "validated"
-    ) {
-      await applyPoMatch(invoice);
+    if (poFieldsChanged) {
+      // Always clear stale match data when PO/GRN fields change so old
+      // exceptions from a previous (now-wrong) PO number are not shown.
+      invoice.matchType = null;
+      invoice.matchStatus = "unmatched";
+      invoice.matchDetails = undefined;
+      invoice.markModified("matchDetails");
+
+      // Re-run matching immediately if a PO number is present.
+      // Skip here when markValidated=true — applyInvoiceValidation will
+      // call applyPoMatch itself after a successful validation pass.
+      if (!body.markValidated && invoice.poNumber?.trim()) {
+        await applyPoMatch(invoice);
+      }
     }
 
     await invoice.save();

@@ -36,6 +36,7 @@ The system is designed for Indian AP workflows (GSTIN/PAN validation, INR curren
 | OCR (fallback) | Google Gemini Vision API (`@google/generative-ai`) |
 | Email | Nodemailer (optional SMTP) |
 | Charts | Recharts |
+| UI motion | framer-motion (sidebar drawer, nav highlights) |
 | File storage | Local filesystem (`/uploads/invoices/`) |
 
 ### Environment variables
@@ -88,8 +89,8 @@ ap-automation/
 │   ├── (auth)/                    # Login & register (no sidebar)
 │   │   ├── login/page.jsx
 │   │   └── register/page.jsx
-│   ├── (dashboard)/               # Main app shell (sidebar + navbar)
-│   │   ├── layout.jsx
+│   ├── (dashboard)/               # Main app shell (fixed-height sidebar + scrollable main)
+│   │   ├── layout.jsx             # h-screen shell, mobile drawer toggle
 │   │   ├── dashboard/page.jsx
 │   │   ├── invoices/
 │   │   │   ├── page.jsx
@@ -108,7 +109,7 @@ ap-automation/
 │   ├── layout.js                  # Root HTML layout
 │   └── page.js                    # Redirect → /dashboard
 ├── components/
-│   ├── layout/                    # Sidebar, Navbar
+│   ├── layout/                    # Sidebar (desktop + mobile drawer), Navbar (legacy)
 │   ├── invoices/                  # Upload, OCR editor, tables, badges
 │   ├── approvals/                 # Queue, actions, chain
 │   ├── vendors/                   # Form, table, onboarding
@@ -145,7 +146,7 @@ First registered user automatically becomes **admin**.
 |-------|------|-------|
 | vendorCode | String | Unique, uppercase |
 | name, email, phone | String | |
-| gstin, pan, tin | String | Validated on save |
+| gstin, pan, tin | String | GSTIN uses official mod-36 checksum (see §5.5); PAN format checked |
 | bankDetails | Object | accountNo, ifsc, bankName, branch |
 | status | Enum | `active`, `inactive`, `pending` |
 | onboardingStatus | Enum | `draft` → `submitted` → `verified` / `rejected` |
@@ -247,7 +248,7 @@ flowchart TD
 3. **PDFs** go directly to Gemini (Tesseract cannot read PDF binaries).
 4. **Images**: Tesseract runs first; if confidence &lt; `OCR_CONFIDENCE_THRESHOLD` (default 85%), Gemini runs automatically.
 5. Fields mapped to `extractedData` (invoice #, dates, GSTIN, PAN, line items, totals).
-6. Validation runs: mandatory fields, GSTIN checksum, PAN format, amount math, duplicates, vendor GST match.
+6. Validation runs: mandatory fields, GSTIN checksum (warning-only on invoices if OCR misread), PAN format, amount math, duplicates, vendor GST match.
 7. If PO number present, 2-way or 3-way match runs automatically after validation.
 8. **Re-run OCR**: `POST /api/invoices/[id]/reocr` after adding `GEMINI_API_KEY`.
 
@@ -270,7 +271,22 @@ Tolerance: ±₹2 or 2% on amounts. Line matching uses description similarity. R
 6. **Full approve** → invoice `approved`, **Payment** record created (`pending`).
 7. **Escalation**: if pending step exceeds SLA hours → status `escalated`, email to admin/CFO.
 
-### 5.4 Vendor onboarding
+### 5.5 GSTIN validation (mod-36 checksum)
+
+GSTINs are 15 characters: **state (2)** + **PAN (10)** + **entity (1)** + **`Z`** + **check digit (1)**.
+
+| Context | Checksum behavior |
+|---------|-------------------|
+| **Vendor create/update** | Blocking error if checksum wrong; message shows expected vs actual character |
+| **Invoice OCR validation** | Checksum mismatch is a **warning** (OCR often misreads one character) |
+
+Algorithm (`lib/validators.js`, GSTN spec): map `0-9A-Z` to 0–35, walk positions 14→1 with alternating multipliers **2, 1, 2, 1…**, sum `floor(product/36) + (product % 36)`, check digit = `(36 - sum % 36) % 36`.
+
+Example: Infosys Karnataka base `29AABCI1681G1Z` → valid GSTIN **`29AABCI1681G1ZK`** (not `…1ZA`).
+
+Helper: `computeGstinCheckDigit(first14Chars)` returns the correct 15th character.
+
+### 5.6 Vendor onboarding
 
 ```
 draft → Submit for review → submitted
@@ -281,7 +297,7 @@ draft → Submit for review → submitted
                     reject → inactive + rejected
 ```
 
-### 5.5 Payment processing
+### 5.7 Payment processing
 
 1. Pending payment appears after full approval.
 2. AP enters reference/UTR, method, date.
@@ -371,6 +387,12 @@ All API routes except login/register require a valid `ap_auth_token` cookie (enf
 | `/payments/[id]` | Process payment |
 | `/reports` | AP aging, GST summary, exceptions (CSV export) |
 
+### 7.1 Dashboard shell (layout)
+
+- **Desktop (`lg+`)**: 260px sidebar locked to viewport height (`h-screen`); main content scrolls independently.
+- **Mobile/tablet**: Hamburger opens slide-in drawer (framer-motion); body scroll locked while open; auto-closes on navigation.
+- **Sidebar footer**: Current user name/role + logout (via `useAuth`).
+
 ---
 
 ## 8. Key Libraries (`lib/`)
@@ -384,7 +406,7 @@ All API routes except login/register require a valid `ap_auth_token` cookie (enf
 | `ocr.js` | Hybrid OCR orchestrator (`extractInvoiceData`) |
 | `ocr-gemini.js` | Gemini Vision extraction + JSON mapping |
 | `invoice-parser.js` | Tesseract raw text → structured fields |
-| `validators.js` | GSTIN, PAN, amounts |
+| `validators.js` | GSTIN (mod-36 RTL checksum), `computeGstinCheckDigit`, PAN, amounts |
 | `invoice-validation.js` | Full invoice validation + trigger PO match |
 | `po-matching.js` | 2-way / 3-way matching |
 | `approval.js` | Chain build, approve/reject, escalation |
@@ -503,4 +525,4 @@ Build output: **28 pages**, **24+ API routes**, middleware ~32 KB.
 
 ---
 
-*Document generated for Templegate AP Automation - reflects implementation in `ap-automation` as of project completion.*
+*Templegate AP Automation — last updated June 2026 (GSTIN checksum fix, dashboard shell, hybrid OCR).*

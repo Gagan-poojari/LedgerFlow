@@ -52,7 +52,7 @@ async function seed() {
     vendor = await Vendor.create({
       vendorCode: "DEMO-001",
       name: "Demo Supplies Pvt Ltd",
-      gstin: "27AABCU9603R1ZM",
+      gstin: "27AABCU9603R1ZN",
       status: "active",
     });
     console.log("Created vendor:", vendor.vendorCode);
