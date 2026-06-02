@@ -75,7 +75,7 @@ export default function OCRResultEditor({ invoice, onSave, saving }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xs">
-      
+
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
         <div className="flex items-center gap-2">
@@ -99,13 +99,12 @@ export default function OCRResultEditor({ invoice, onSave, saving }) {
           </div>
           <div className="h-2 rounded-full bg-slate-200/60 overflow-hidden shadow-inner">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${
-                invoice.ocrConfidence >= 85
+              className={`h-full rounded-full transition-all duration-500 ${invoice.ocrConfidence >= 85
                   ? "bg-emerald-500"
                   : invoice.ocrConfidence >= 60
                     ? "bg-amber-500"
                     : "bg-red-500"
-              }`}
+                }`}
               style={{ width: `${Math.min(100, invoice.ocrConfidence)}%` }}
             />
           </div>
@@ -132,6 +131,11 @@ export default function OCRResultEditor({ invoice, onSave, saving }) {
         <Field label="Tax Amount" type="number" value={form.tax} onChange={(v) => handleChange("tax", v)} disabled={saving} />
         <Field label="Total Amount" type="number" value={form.total} onChange={(v) => handleChange("total", v)} disabled={saving} />
         <Field label="Currency" value={form.currency} onChange={(v) => handleChange("currency", v)} disabled={saving} />
+        {/* <Field label="GSTIN" value={form.gstin} onChange={(v) => handleChange("gstin", v)} disabled={saving} /> */}
+        {/* <Field label="PAN Number" value={form.pan} onChange={(v) => handleChange("pan", v)} disabled={saving} /> */}
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
         <Field label="GSTIN" value={form.gstin} onChange={(v) => handleChange("gstin", v)} disabled={saving} />
         <Field label="PAN Number" value={form.pan} onChange={(v) => handleChange("pan", v)} disabled={saving} />
       </div>

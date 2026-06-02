@@ -76,7 +76,6 @@ export default function MatchPanel({ invoice, onRunMatch, matching }) {
             </div>
           )}
 
-          {/* EXCEPTION STACKS */}
           {details.exceptions?.length > 0 && (
             <div className="rounded-xl border border-red-200/60 bg-red-50/50 p-4 space-y-2">
               <div className="flex items-center gap-2 text-xs font-bold text-red-900 uppercase tracking-wide">

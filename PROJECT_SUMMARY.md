@@ -326,7 +326,7 @@ draft → Submit for review → submitted
 | POST | `/api/invoices/[id]/reocr` | Re-run OCR on existing file |
 | GET | `/api/invoices/[id]` | Detail |
 | PUT | `/api/invoices/[id]` | Update fields / validate |
-| DELETE | `/api/invoices/[id]` | Delete |
+| DELETE | `/api/invoices/[id]` | Delete invoice, upload file, and pending payments (`admin`, `ap_clerk`; blocks `paid` / processed payment) |
 | GET | `/api/invoices/[id]/file` | Download/view file |
 | POST | `/api/invoices/[id]/validate` | Re-run validation |
 | POST | `/api/invoices/[id]/match` | Re-run PO matching |
@@ -347,7 +347,7 @@ draft → Submit for review → submitted
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET/POST | `/api/purchase-orders` | List / create PO |
+| GET/POST | `/api/purchase-orders` | List (filter `vendorId`, `poNumber`) / create PO with line items |
 | GET/POST | `/api/grns` | List / create GRN |
 
 ### Payments
@@ -381,7 +381,7 @@ All API routes except login/register require a valid `ap_auth_token` cookie (enf
 | `/invoices/[id]` | OCR review, validation, matching, approval, payment card |
 | `/vendors` | Vendor directory |
 | `/vendors/new` | Create vendor |
-| `/vendors/[id]` | Edit + onboarding actions |
+| `/vendors/[id]` | Edit, onboarding actions, **create/list purchase orders** |
 | `/approvals` | Approval queue with approve/reject |
 | `/payments` | Payment list |
 | `/payments/[id]` | Process payment |
@@ -389,7 +389,7 @@ All API routes except login/register require a valid `ap_auth_token` cookie (enf
 
 ### 7.1 Dashboard shell (layout)
 
-- **Desktop (`lg+`)**: 260px sidebar locked to viewport height (`h-screen`); main content scrolls independently.
+- **Desktop (`lg+`)**: 260px sidebar fixed to viewport (`fixed inset-y-0`); main content uses `lg:pl-[260px]` and scrolls independently.
 - **Mobile/tablet**: Hamburger opens slide-in drawer (framer-motion); body scroll locked while open; auto-closes on navigation.
 - **Sidebar footer**: Current user name/role + logout (via `useAuth`).
 
@@ -412,6 +412,8 @@ All API routes except login/register require a valid `ap_auth_token` cookie (enf
 | `approval.js` | Chain build, approve/reject, escalation |
 | `mailer.js` | Nodemailer with SMTP fallback logging |
 | `vendor-validation.js` | Vendor field validation |
+| `po-validation.js` | PO line items + total validation |
+| `po-serialize.js` | PO API response shaping |
 | `payment-serialize.js` | API response shaping |
 | `dashboard-stats.js` | Dashboard aggregations |
 | `reports.js` | AP aging, GST, exceptions reports |
@@ -442,9 +444,9 @@ node scripts/seed-sample-po.js            # DEMO-001 vendor, PO-2024-1001, GRN-2
 
 **Sample PO matching test**
 
-- PO: `PO-2024-1001`
+- PO: `PO-2024-1001` (total ₹50,000 — matches `sample-invoices/invoice_valid_50k.pdf`)
 - GRN: `GRN-2024-5001`
-- Invoice total: `42500` (for full match with seeded line items)
+- Invoice total: `50000` (for full match with seeded line items)
 
 ---
 

@@ -6,6 +6,8 @@ import { serializeInvoice } from "@/lib/invoice-serialize";
 import { INVOICE_STATUSES } from "@/types";
 import { applyInvoiceValidation } from "@/lib/invoice-validation";
 import { applyPoMatch } from "@/lib/po-matching";
+import { deleteUploadFile } from "@/lib/upload";
+import Payment from "@/models/Payment";
 
 export async function GET(_request, { params }) {
   const user = await getSessionUser();
@@ -116,16 +118,48 @@ export async function PUT(request, { params }) {
   }
 }
 
+const INVOICE_DELETE_ROLES = new Set(["admin", "ap_clerk"]);
+
 export async function DELETE(_request, { params }) {
   const user = await getSessionUser();
   if (!user) return unauthorizedResponse();
 
+  if (!INVOICE_DELETE_ROLES.has(user.role)) {
+    return NextResponse.json(
+      { error: "You do not have permission to delete invoices" },
+      { status: 403 }
+    );
+  }
+
   try {
     await connectDB();
-    const invoice = await Invoice.findByIdAndDelete(params.id);
+    const invoice = await Invoice.findById(params.id);
     if (!invoice) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
+
+    if (invoice.status === "paid") {
+      return NextResponse.json(
+        { error: "Paid invoices cannot be deleted" },
+        { status: 400 }
+      );
+    }
+
+    const processedPayment = await Payment.findOne({
+      invoiceId: invoice._id,
+      status: "processed",
+    }).select("_id");
+    if (processedPayment) {
+      return NextResponse.json(
+        { error: "Cannot delete an invoice with a processed payment" },
+        { status: 400 }
+      );
+    }
+
+    await Payment.deleteMany({ invoiceId: invoice._id });
+    await deleteUploadFile(invoice.uploadedFile?.path);
+    await invoice.deleteOne();
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Delete invoice error:", error);

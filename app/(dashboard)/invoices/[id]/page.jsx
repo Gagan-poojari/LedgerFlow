@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -13,7 +13,8 @@ import {
   CheckCircle2, 
   Send, 
   Layers, 
-  Terminal 
+  Terminal,
+  Trash2,
 } from "lucide-react";
 
 import InvoiceStatusBadge from "@/components/invoices/InvoiceStatusBadge";
@@ -32,11 +33,18 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function InvoiceDetailPage() {
   const { id } = useParams();
-  const { getById, update, runMatch, reocr, loading, error } = useInvoices();
+  const router = useRouter();
+  const { getById, update, runMatch, reocr, remove, loading, error } = useInvoices();
   const { submitForApproval, approve, loading: approvalLoading } = useApprovals();
   const { user } = useAuth();
   const [invoice, setInvoice] = useState(null);
   const [saved, setSaved] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const canDelete =
+    user &&
+    ["admin", "ap_clerk"].includes(user.role) &&
+    invoice?.status !== "paid";
 
   const pendingStep = invoice?.approvalChain?.find((s) => s.status === "pending");
   const userCanApprove =
@@ -152,6 +160,33 @@ export default function InvoiceDetailPage() {
                   <RefreshCw className={`h-3 w-3 stroke-[2.2] ${loading ? 'animate-spin' : ''}`} />
                   <span>Re-run OCR</span>
                 </button>
+                {canDelete && (
+                  <button
+                    type="button"
+                    disabled={loading || deleting}
+                    onClick={async () => {
+                      const label = invoice.invoiceNumber || "this invoice";
+                      if (
+                        !window.confirm(
+                          `Delete ${label}? This removes the upload and any pending payment record. This cannot be undone.`
+                        )
+                      ) {
+                        return;
+                      }
+                      setDeleting(true);
+                      try {
+                        await remove(id);
+                        router.push("/invoices");
+                      } finally {
+                        setDeleting(false);
+                      }
+                    }}
+                    className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded-md transition-colors disabled:opacity-50 font-bold"
+                  >
+                    <Trash2 className={`h-3 w-3 stroke-[2.2] ${deleting ? "animate-pulse" : ""}`} />
+                    <span>{deleting ? "Deleting..." : "Delete"}</span>
+                  </button>
+                )}
               </div>
             </div>
           )}

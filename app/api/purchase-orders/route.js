@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { getSessionUser, unauthorizedResponse } from "@/lib/api-auth";
 import PurchaseOrder from "@/models/PurchaseOrder";
+import Vendor from "@/models/Vendor";
+import { serializePurchaseOrder } from "@/lib/po-serialize";
+import { validatePurchaseOrderPayload } from "@/lib/po-validation";
 
 export async function GET(request) {
   const user = await getSessionUser();
@@ -9,17 +12,24 @@ export async function GET(request) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const poNumber = searchParams.get("poNumber");
+    const poNumber = searchParams.get("poNumber")?.trim();
+    const vendorId = searchParams.get("vendorId")?.trim();
 
     await connectDB();
-    const filter = poNumber ? { poNumber } : {};
+
+    const filter = {};
+    if (poNumber) filter.poNumber = poNumber;
+    if (vendorId) filter.vendorId = vendorId;
+
     const orders = await PurchaseOrder.find(filter)
       .sort({ createdAt: -1 })
-      .limit(50)
+      .limit(100)
       .populate("vendorId", "name vendorCode")
       .lean();
 
-    return NextResponse.json({ purchaseOrders: orders });
+    return NextResponse.json({
+      purchaseOrders: orders.map(serializePurchaseOrder),
+    });
   } catch (error) {
     console.error("List PO error:", error);
     return NextResponse.json(
@@ -35,25 +45,34 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { poNumber, vendorId, lineItems, totalAmount } = body;
+    const validation = validatePurchaseOrderPayload(body);
 
-    if (!poNumber?.trim() || !vendorId || totalAmount == null) {
-      return NextResponse.json(
-        { error: "poNumber, vendorId, and totalAmount are required" },
-        { status: 400 }
-      );
+    if (validation.errors.length) {
+      return NextResponse.json({ errors: validation.errors }, { status: 400 });
     }
 
     await connectDB();
+
+    const vendor = await Vendor.findById(body.vendorId).select("_id name");
+    if (!vendor) {
+      return NextResponse.json({ error: "Vendor not found" }, { status: 404 });
+    }
+
     const po = await PurchaseOrder.create({
-      poNumber: poNumber.trim(),
-      vendorId,
-      lineItems: lineItems || [],
-      totalAmount,
+      poNumber: validation.poNumber,
+      vendorId: vendor._id,
+      lineItems: validation.lineItems,
+      totalAmount: validation.totalAmount,
+      status: "open",
       createdBy: user._id,
     });
 
-    return NextResponse.json({ purchaseOrder: po }, { status: 201 });
+    await po.populate("vendorId", "name vendorCode");
+
+    return NextResponse.json(
+      { purchaseOrder: serializePurchaseOrder(po) },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Create PO error:", error);
     if (error.code === 11000) {

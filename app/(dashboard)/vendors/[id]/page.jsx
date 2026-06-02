@@ -7,6 +7,7 @@ import { ArrowLeft, ShieldAlert, Building2, Terminal, Loader2, RefreshCw } from 
 import VendorForm from "@/components/vendors/VendorForm";
 import VendorStatusBadge from "@/components/vendors/VendorStatusBadge";
 import OnboardingActions from "@/components/vendors/OnboardingActions";
+import VendorPurchaseOrders from "@/components/vendors/VendorPurchaseOrders";
 import { useVendors } from "@/hooks/useVendors";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -161,6 +162,13 @@ export default function VendorDetailPage() {
           onAction={handleOnboarding}
         />
       </div>
+
+      {/* Purchase orders for this vendor */}
+      <VendorPurchaseOrders
+        vendorId={vendor.id}
+        vendorCode={vendor.vendorCode}
+        disabled={loading || isPending}
+      />
 
       {/* Vendor Form */}
       <div className={`pt-2 transition-opacity duration-150 ${(loading || isPending) ? "opacity-50 pointer-events-none" : "opacity-100"}`}>

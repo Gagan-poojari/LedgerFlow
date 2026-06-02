@@ -45,11 +45,10 @@ function NavLinks({ onNavigate }) {
             key={item.href}
             href={item.href}
             onClick={onNavigate}
-            className={`group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold transition-all duration-200 ${
-              active
+            className={`group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold transition-all duration-200 ${active
                 ? "text-slate-900"
                 : "text-slate-400 hover:text-slate-700"
-            }`}
+              }`}
           >
             {/* Active highlight pill */}
             {active && (
@@ -63,11 +62,10 @@ function NavLinks({ onNavigate }) {
 
             <span className="relative z-10 flex shrink-0 items-center justify-center">
               <IconComponent
-                className={`h-[16px] w-[16px] stroke-[2] transition-all duration-200 ${
-                  active
+                className={`h-[16px] w-[16px] stroke-[2] transition-all duration-200 ${active
                     ? "text-slate-800"
                     : "text-slate-300 group-hover:text-slate-500"
-                }`}
+                  }`}
               />
             </span>
 
@@ -130,8 +128,13 @@ function SidebarInner({ onNavigate, showClose, onClose }) {
         <NavLinks onNavigate={onNavigate} />
       </nav>
 
+      {/* Divider */}
+      <div className="px-5">
+        <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+      </div>
+
       {/* USER INFO + LOGOUT */}
-      <div className="shrink-0 p-5 space-y-3 flex gap-2">
+      <div className="shrink-0 p-5 pt-2 space-y-3 flex gap-2">
         <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
         <AnimatePresence mode="wait">
@@ -141,7 +144,7 @@ function SidebarInner({ onNavigate, showClose, onClose }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.15 }}
-              className="flex items-center gap-3 p-2 rounded-xl bg-slate-50/50 border border-slate-100/50"
+              className="flex items-center gap-3 p-2 pt-0 rounded-xl bg-slate-50/50 border border-slate-100/50"
             >
               {/* Avatar */}
               <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-slate-200 to-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-500 shadow-sm shrink-0">
@@ -197,7 +200,7 @@ export default function Sidebar({ isOpen, onClose }) {
   return (
     <>
       {/* DESKTOP SIDEBAR — always visible on lg+ */}
-      <aside className="hidden lg:flex w-[260px] h-screen shrink-0 flex-col overflow-hidden border-r border-slate-200/60 bg-white/95 backdrop-blur-sm">
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-30 lg:flex w-[260px] flex-col overflow-hidden border-r border-slate-200/60 bg-white">
         <SidebarInner showClose={false} />
       </aside>
 

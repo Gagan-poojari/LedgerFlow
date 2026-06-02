@@ -119,6 +119,22 @@ export function useInvoices() {
     }
   }, []);
 
+  const remove = useCallback(async (id) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/invoices/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Delete failed");
+      return true;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const reocr = useCallback(async (id) => {
     setLoading(true);
     setError(null);
@@ -135,5 +151,5 @@ export function useInvoices() {
     }
   }, []);
 
-  return { loading, error, list, getById, upload, update, validate, runMatch, reocr };
+  return { loading, error, list, getById, upload, update, validate, runMatch, reocr, remove };
 }

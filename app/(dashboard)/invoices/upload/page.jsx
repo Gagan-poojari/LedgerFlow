@@ -39,12 +39,6 @@ export default function InvoiceUploadPage() {
           <p>
             <span className="font-bold text-slate-700">AI-Powered Extraction:</span> We automatically read invoice details from your uploaded files. To enable advanced AI extraction, set up your:
           </p>
-          <div className="flex items-center gap-1.5 mt-1">
-            <code className="bg-white border border-slate-200 text-slate-800 font-mono px-1.5 py-0.5 rounded-md text-[10px] font-bold shadow-sm">
-              GEMINI_API_KEY
-            </code>
-            <span className="text-slate-400">environment variable.</span>
-          </div>
         </div>
       </div>
 

@@ -14,7 +14,7 @@ export default function DashboardLayout({ children }) {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main content area */}
-      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+      <div className="flex flex-1 flex-col overflow-hidden min-w-0 lg:pl-[260px]">
 
         {/* Mobile-only top bar */}
         <header className="lg:hidden sticky top-0 z-40 flex h-14 items-center px-4 border-b border-slate-200/60 bg-white/80 backdrop-blur-xl">

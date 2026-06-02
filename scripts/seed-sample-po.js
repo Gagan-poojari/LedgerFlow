@@ -59,33 +59,41 @@ async function seed() {
   }
 
   const poNumber = "PO-2024-1001";
+  const lineItems = [
+    {
+      description: "Professional services",
+      quantity: 1,
+      unitPrice: 50000,
+      amount: 50000,
+    },
+  ];
   let po = await PO.findOne({ poNumber });
   if (!po) {
-    const lineItems = [
-      {
-        description: "Office paper A4",
-        quantity: 100,
-        unitPrice: 250,
-        amount: 25000,
-      },
-      {
-        description: "Printer toner",
-        quantity: 5,
-        unitPrice: 3500,
-        amount: 17500,
-      },
-    ];
     po = await PO.create({
       poNumber,
       vendorId: vendor._id,
       lineItems,
-      totalAmount: 42500,
+      totalAmount: 50000,
       status: "open",
     });
     console.log("Created PO:", poNumber, "total", po.totalAmount);
+  } else {
+    po.lineItems = lineItems;
+    po.totalAmount = 50000;
+    po.vendorId = vendor._id;
+    await po.save();
+    console.log("Updated PO:", poNumber, "total", po.totalAmount);
   }
 
   const grnNumber = "GRN-2024-5001";
+  const grnLineItems = [
+    {
+      description: "Professional services",
+      orderedQty: 1,
+      receivedQty: 1,
+      unitPrice: 50000,
+    },
+  ];
   let grn = await GRN.findOne({ grnNumber });
   if (!grn) {
     grn = await GRN.create({
@@ -93,30 +101,23 @@ async function seed() {
       poNumber,
       poId: po._id,
       vendorId: vendor._id,
-      lineItems: [
-        {
-          description: "Office paper A4",
-          orderedQty: 100,
-          receivedQty: 100,
-          unitPrice: 250,
-        },
-        {
-          description: "Printer toner",
-          orderedQty: 5,
-          receivedQty: 5,
-          unitPrice: 3500,
-        },
-      ],
+      lineItems: grnLineItems,
       status: "closed",
     });
     console.log("Created GRN:", grnNumber);
+  } else {
+    grn.lineItems = grnLineItems;
+    grn.poId = po._id;
+    grn.vendorId = vendor._id;
+    await grn.save();
+    console.log("Updated GRN:", grnNumber);
   }
 
   console.log("\nUse on invoice:");
   console.log("  PO number:", poNumber);
   console.log("  GRN number:", grnNumber);
   console.log("  Vendor ID:", vendor._id.toString());
-  console.log("  Line totals should sum to 42500 for a full match");
+  console.log("  Line totals should sum to 50000 for a full match (sample PDF)");
 
   await mongoose.disconnect();
 }
