@@ -7,6 +7,7 @@ const publicApiPaths = [
   "/api/auth/login",
   "/api/auth/register",
   "/api/auth/logout",
+  "/api/auth/me",
 ];
 
 export async function middleware(request) {
@@ -47,6 +48,7 @@ export async function middleware(request) {
 
 export const config = {
   matcher: [
+    "/dashboard",
     "/dashboard/:path*",
     "/invoices/:path*",
     "/vendors/:path*",

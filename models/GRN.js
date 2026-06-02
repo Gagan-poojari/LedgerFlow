@@ -39,7 +39,6 @@ const grnSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-grnSchema.index({ grnNumber: 1 });
 grnSchema.index({ poNumber: 1 });
 
 export default mongoose.models.GRN || mongoose.model("GRN", grnSchema);

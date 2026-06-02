@@ -13,7 +13,7 @@ export function useAuth() {
       const res = await fetch("/api/auth/me");
       if (res.ok) {
         const data = await res.json();
-        setUser(data.user);
+        setUser(data.user ?? null);
       } else {
         setUser(null);
       }

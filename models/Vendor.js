@@ -35,7 +35,6 @@ const vendorSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-vendorSchema.index({ vendorCode: 1 });
 vendorSchema.index({ gstin: 1 });
 
 export default mongoose.models.Vendor || mongoose.model("Vendor", vendorSchema);

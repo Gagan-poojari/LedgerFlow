@@ -13,8 +13,11 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "AP Automation | Templegate",
+  title: "AP Automation",
   description: "Accounts payable automation - invoices, approvals, payments",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {

@@ -91,8 +91,8 @@ function SidebarInner({ onNavigate, showClose, onClose }) {
         <div className="px-5 pt-5 pb-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-slate-900 to-slate-700 text-white shadow-sm shadow-slate-900/25 font-black text-sm tracking-wider shrink-0">
-                AP
+              <div className="flex items-center justify-center rounded-full text-white font-black tracking-wider shrink-0">
+              <img src="/logo.png" className="h-9 w-9 " alt="logo"/>
               </div>
               <div>
                 <p className="text-sm font-extrabold text-slate-900 tracking-tight leading-tight">
