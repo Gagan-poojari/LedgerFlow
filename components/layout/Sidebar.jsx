@@ -96,7 +96,7 @@ function SidebarInner({ onNavigate, showClose, onClose }) {
               </div>
               <div>
                 <p className="text-sm font-extrabold text-slate-900 tracking-tight leading-tight">
-                  Templegate
+                  LedgerFlow
                 </p>
                 <p className="text-[10px] font-semibold text-slate-400 leading-tight mt-0.5">
                   AP Automation

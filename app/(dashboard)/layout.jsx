@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }) {
             <div className="h-7 w-7 rounded-lg bg-slate-900 text-white flex items-center justify-center text-[10px] font-black tracking-wider">
               TG
             </div>
-            <span className="text-sm font-bold text-slate-900 tracking-tight">Templegate</span>
+            <span className="text-sm font-bold text-slate-900 tracking-tight">LedgerFlow</span>
           </div>
         </header>
 

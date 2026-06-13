@@ -1,7 +1,7 @@
 # AP Automation - Detailed Project Summary
 
-**Templegate Accounts Payable Automation**  
-Location: `c:\TemplegateR2\ap-automation`  
+**LedgerFlow Accounts Payable Automation**  
+Location: `c:\LedgerFlowR2\ap-automation`  
 Stack: Next.js 14 (App Router) · MongoDB · Mongoose · JWT Auth · Hybrid OCR (Tesseract + Gemini)
 
 ---
@@ -527,4 +527,4 @@ Build output: **28 pages**, **24+ API routes**, middleware ~32 KB.
 
 ---
 
-*Templegate AP Automation — last updated June 2026 (GSTIN checksum fix, dashboard shell, hybrid OCR).*
+*LedgerFlow AP Automation — last updated June 2026 (GSTIN checksum fix, dashboard shell, hybrid OCR).*

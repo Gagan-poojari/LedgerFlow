@@ -39,7 +39,7 @@ export default function RegisterPage() {
             Create an Account
           </h1>
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-            Templegate AP Automation
+            LedgerFlow AP Automation
           </p>
         </div>
 

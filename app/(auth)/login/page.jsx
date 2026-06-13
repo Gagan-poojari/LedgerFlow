@@ -35,7 +35,7 @@ export default function LoginPage() {
             <ShieldCheck className="h-5 w-5 stroke-[2]" />
           </div>
           <h1 className="text-xl font-black text-slate-900 tracking-tight">
-            Templegate AP Automation
+            LedgerFlow AP Automation
           </h1>
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
             Accounts Payable & Invoices

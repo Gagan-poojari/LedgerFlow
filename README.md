@@ -1,4 +1,4 @@
-# Templegate AP Automation
+# LedgerFlow AP Automation
 
 Full-stack accounts payable automation for Indian AP workflows: invoice capture (hybrid OCR), validation, PO matching, approvals, vendor onboarding, payments, and reporting.
 
@@ -160,4 +160,4 @@ Uploaded files are stored under `uploads/invoices/` (gitignored).
 
 ---
 
-*Templegate AP Automation — `ap-automation/`*
+*LedgerFlow AP Automation — `ap-automation/`*
