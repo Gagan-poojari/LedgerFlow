@@ -133,22 +133,6 @@ Uploaded files are stored under `uploads/invoices/` (gitignored).
 
 ---
 
-## Module checklist
-
-| # | Module | Status |
-|---|--------|--------|
-| 1 | Setup, auth, middleware, models | Done |
-| 3 | Invoices + hybrid OCR | Done |
-| 4 | Validation (GSTIN, PAN, amounts) | Done |
-| 5 | PO matching (2-way / 3-way) | Done |
-| 6 | Approvals + email | Done |
-| 7 | Vendors + onboarding + **manual POs** | Done |
-| 8 | Payments | Done |
-| 9 | Dashboard + charts | Done |
-| 10 | Reports + CSV | Done |
-
----
-
 ## Troubleshooting
 
 | Issue | Fix |
